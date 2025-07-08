@@ -20,8 +20,14 @@ import collections
 from absl.testing import absltest
 import numpy as np
 
-from graph_embedding.simulations import heterogeneous_sbm_utils as hsu
-from graph_embedding.simulations import sbm_simulator
+from .heterogeneous_sbm_utils import GetPropMat
+from .sbm_simulator import (
+  StochasticBlockModel,
+  SimulateSbm,
+  SimulateFeatures,
+  SimulateEdgeFeatures,
+  MatchType,
+)
 
 
 class SbmSimulatorTestSbm(absltest.TestCase):
@@ -151,7 +157,7 @@ class SbmSimulatorTestHeterogeneousSbm(absltest.TestCase):
   def setUp(self):
     super(SbmSimulatorTestHeterogeneousSbm, self).setUp()
     self.simulation_with_graph = sbm_simulator.StochasticBlockModel()
-    prop_mat = hsu.GetPropMat(2, 5.0, 2, 5.0, 5.0)
+    prop_mat = GetPropMat(2, 5.0, 2, 5.0, 5.0)
     sbm_simulator.SimulateSbm(self.simulation_with_graph,
                               num_vertices=400,
                               num_edges=16000.0,

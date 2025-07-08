@@ -17,31 +17,35 @@
 from absl.testing import absltest
 import numpy as np
 
-from graph_embedding.simulations import heterogeneous_sbm_utils as hsu
+from .heterogeneous_sbm_utils import (
+  GetClusterTypeComponents,
+  GetCrossLinks,
+  GetPropMat,
+)
 
 
 class GetClusterTypeComponentsTest(absltest.TestCase):
 
   def test_equal_sizes(self):
-    (cluster_index_lists, type_components) = hsu.GetClusterTypeComponents(
+    (cluster_index_lists, type_components) = GetClusterTypeComponents(
         [2, 2])
     self.assertEqual(cluster_index_lists, [[0, 1], [2, 3]])
     self.assertEqual(type_components, [[0, 2], [1, 3]])
 
   def test_first_greater_than_second(self):
-    (cluster_index_lists, type_components) = hsu.GetClusterTypeComponents(
+    (cluster_index_lists, type_components) = GetClusterTypeComponents(
         [3, 2])
     self.assertEqual(cluster_index_lists, [[0, 1, 2], [3, 4]])
     self.assertEqual(type_components, [[0, 2, 4], [1, 3]])
 
   def test_second_greater_than_first(self):
-    (cluster_index_lists, type_components) = hsu.GetClusterTypeComponents(
+    (cluster_index_lists, type_components) = GetClusterTypeComponents(
         [2, 3])
     self.assertEqual(cluster_index_lists, [[0, 1], [2, 3, 4]])
     self.assertEqual(type_components, [[0, 2, 4], [1, 3]])
 
   def test_three_type_mixed(self):
-    (cluster_index_lists, type_components) = hsu.GetClusterTypeComponents(
+    (cluster_index_lists, type_components) = GetClusterTypeComponents(
         [3, 4, 2])
     self.assertEqual(cluster_index_lists, [[0, 1, 2], [3, 4, 5, 6], [7, 8]])
     self.assertEqual(type_components, [[0, 2, 4, 6, 8], [1, 3, 5, 7]])
@@ -50,19 +54,19 @@ class GetClusterTypeComponentsTest(absltest.TestCase):
 class GetCrossLinksTest(absltest.TestCase):
 
   def test_equal_sizes(self):
-    self.assertEqual(hsu.GetCrossLinks([2, 2], 0, 1),
+    self.assertEqual(GetCrossLinks([2, 2], 0, 1),
                      [(0, 2), (1, 3)])
 
   def test_first_greater_than_second(self):
-    self.assertEqual(hsu.GetCrossLinks([3, 2], 0, 1),
+    self.assertEqual(GetCrossLinks([3, 2], 0, 1),
                      [(0, 4), (2, 4), (1, 3)])
 
   def test_second_greater_than_first(self):
-    self.assertEqual(hsu.GetCrossLinks([2, 3], 0, 1),
+    self.assertEqual(GetCrossLinks([2, 3], 0, 1),
                      [(0, 2), (0, 4), (1, 3)])
 
   def test_three_type_mixed12(self):
-    self.assertEqual(hsu.GetCrossLinks([3, 4, 2], 0, 1),
+    self.assertEqual(GetCrossLinks([3, 4, 2], 0, 1),
                      [(0, 4), (0, 6), (2, 4), (2, 6), (1, 3), (1, 5)])
 
 
@@ -70,14 +74,14 @@ class GetPropMatTest(absltest.TestCase):
 
   def test_homogeneous_inptus(self):
     np.testing.assert_array_almost_equal(
-        hsu.GetPropMat(3, 4.0),
+        GetPropMat(3, 4.0),
         np.array([[4.0, 1.0, 1.0],
                   [1.0, 4.0, 1.0],
                   [1.0, 1.0, 4.0]]))
 
   def test_heterogeneous_inputs(self):
     np.testing.assert_array_almost_equal(
-        hsu.GetPropMat(3, 3.0, 2, 2.0, 4.0),
+        GetPropMat(3, 3.0, 2, 2.0, 4.0),
         np.array([[3.0, 1.0, 1.0, 1.0, 4.0],
                   [1.0, 3.0, 1.0, 4.0, 1.0],
                   [1.0, 1.0, 3.0, 1.0, 4.0],

@@ -1,0 +1,11 @@
+# This file may be used to create an environment using:
+# $ conda create --name <env> --file <this file>
+# platform: osx-64
+graph-tool=2.96=py311h196e4f8_300
+matplotlib=3.10.1=py311h6eed73b_0
+networkx=3.4.2=pyh267e887_2
+networkx-temporal=1.2.1=pypi_0
+numpy=1.26.4=py311hc43a94b_0
+pandas=2.2.3=py311haeb46be_1
+torch=2.2.2=pypi_0
+torch-geometric=2.6.1=pypi_0

@@ -44,13 +44,19 @@ import typing
 
 import numpy as np
 
-from graph_embedding.simulations import heterogeneous_sbm_utils as hsu
-from graph_embedding.simulations import sbm_simulator
+from .heterogeneous_sbm_utils import GetPropMat
+from .sbm_simulator import (
+  StochasticBlockModel,
+  SimulateSbm,
+  SimulateFeatures,
+  SimulateEdgeFeatures,
+  MatchType,
+)
 
 # Types
 Sequence = typing.Sequence
 Optional = typing.Optional
-MatchType = sbm_simulator.MatchType
+MatchType = MatchType
 
 
 def GenerateStochasticBlockModelWithFeatures(
@@ -97,7 +103,7 @@ def GenerateStochasticBlockModelWithFeatures(
       clusters from # graph clusters. In this case, # feature clusters
       will be set equal to # graph clusters. If left as default (None),
       and input sbm_data is homogeneous, set to len(pi1).
-    feature_group_match_type: see sbm_simulator.MatchType.
+    feature_group_match_type: see MatchType.
     feature_cluster_variance: variance of feature clusters around their centers.
       centers. Increasing this weakens node feature signal.
     edge_feature_dim: dimension of edge features.
@@ -124,21 +130,21 @@ def GenerateStochasticBlockModelWithFeatures(
   Raises:
     ValueError: if neither of prop_mat or edge_probability_profile are provided.
   """
-  result = sbm_simulator.StochasticBlockModel()
+  result = StochasticBlockModel()
   if prop_mat is None and edge_probability_profile is None:
     raise ValueError(
         "One of prop_mat or edge_probability_profile must be provided.")
   if prop_mat is None and edge_probability_profile is not None:
-    prop_mat = hsu.GetPropMat(
+    prop_mat = GetPropMat(
         num_clusters1=len(pi),
         p_to_q_ratio1=edge_probability_profile.p_to_q_ratio1,
         num_clusters2=0 if pi2 is None else len(pi2),
         p_to_q_ratio2=edge_probability_profile.p_to_q_ratio2,
         p_to_q_ratio_cross=edge_probability_profile.p_to_q_ratio_cross)
 
-  sbm_simulator.SimulateSbm(result, num_vertices, num_edges, pi,
+  SimulateSbm(result, num_vertices, num_edges, pi,
                             prop_mat, out_degs, pi2)
-  sbm_simulator.SimulateFeatures(result, feature_center_distance,
+  SimulateFeatures(result, feature_center_distance,
                                  feature_dim, num_feature_groups,
                                  feature_group_match_type,
                                  feature_cluster_variance,
@@ -147,7 +153,7 @@ def GenerateStochasticBlockModelWithFeatures(
                                  feature_type_correlation,
                                  feature_type_center_distance)
   if edge_feature_dim > 0:
-    sbm_simulator.SimulateEdgeFeatures(result, edge_feature_dim,
+    SimulateEdgeFeatures(result, edge_feature_dim,
                                        edge_center_distance,
                                        edge_cluster_variance)
   return result

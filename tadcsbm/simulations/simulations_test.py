@@ -19,18 +19,21 @@ import collections
 from absl.testing import absltest
 import numpy as np
 
-from graph_embedding.simulations import sbm_simulator
-from graph_embedding.simulations import simulations
+from .sbm_simulator import EdgeProbabilityProfile
+from .simulations import (
+  GenerateStochasticBlockModelWithFeatures,
+  MatchType,
+)
 
 
 class SimulationsTest(absltest.TestCase):
 
   def test_simulate_sbm_with_features(self):
-    result = simulations.GenerateStochasticBlockModelWithFeatures(
+    result = GenerateStochasticBlockModelWithFeatures(
         num_vertices=50, num_edges=500.0, pi=[1, 1],
         prop_mat=np.ones(shape=(2, 2)),
         feature_center_distance=1.0, feature_dim=16,
-        feature_group_match_type=simulations.MatchType.NESTED,
+        feature_group_match_type=MatchType.NESTED,
         edge_feature_dim=4)
 
     self.assertEqual(result.graph.num_vertices(), 50)
@@ -44,7 +47,7 @@ class SimulationsTest(absltest.TestCase):
                          v in result.edge_features.values()]))
 
   def test_heterogeneous_sbm(self):
-    result = simulations.GenerateStochasticBlockModelWithFeatures(
+    result = GenerateStochasticBlockModelWithFeatures(
         num_vertices=400,
         num_edges=16000.0,
         pi=[1, 1],

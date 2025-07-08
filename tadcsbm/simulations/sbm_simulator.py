@@ -28,10 +28,11 @@ from typing import Dict, List, Optional, Sequence, Tuple
 
 import graph_tool
 from graph_tool import generation
+# from graph_tool.stats import remove_self_loops, remove_parallel_edges
 import networkx as nx
 import numpy as np
 
-from graph_embedding.simulations import heterogeneous_sbm_utils as hsu
+from .heterogeneous_sbm_utils import GetCrossLinks
 
 # pylint: disable=g-explicit-length-test
 
@@ -275,13 +276,48 @@ def _GenerateNodeMemberships(num_vertices,
   return memberships
 
 
+def _TransitionNodeMemberships(graph_memberships,
+                               tau_mat):
+  """Generates node memberships for a temporal SBM with transition probabilities.
+
+  This function uses the transition probabilities in tau_mat to generate
+  node memberships for a temporal SBM. The input graph_memberships is assumed
+  to be the memberships at time t. The output is a list of memberships at
+  time t+1, where each node's membership is determined by the transition
+  probabilities in tau_mat.
+
+  Args:
+    graph_memberships: list of integer node classes at time t.
+    tau_mat: square, symmetric matrix of transition probabilities. The entry
+      tau_mat[i, j] is the probability that a node in community i at time t
+      will be in community j at time t+1.
+
+  Returns:
+    np vector of ints representing community indices at time t+1.
+  """
+  num_clusters = len(set(graph_memberships))
+  set_clusters = list(range(num_clusters))
+  if not tau_mat.shape[0] == tau_mat.shape[1] == num_clusters:
+    raise ValueError("tau_mat must be k x k; k = number of clusters in graph_memberships")
+  if not np.all(np.isclose(np.sum(tau_mat, axis=1), 1.0)):
+    raise ValueError("tau_mat must be a stochastic matrix (rows sum to 1)")
+  num_vertices = len(graph_memberships)
+  new_memberships = np.array([
+    np.random.choice(set_clusters, p=tau_mat[graph_memberships[i]])
+    for i in range(num_vertices)
+  ])
+  return new_memberships
+
+
 def SimulateSbm(sbm_data,
                 num_vertices,
                 num_edges,
                 pi,
                 prop_mat,
                 out_degs = None,
-                pi2 = None):
+                pi2 = None,
+                tau_mat = None,
+                graph_memberships = None):
   """Generates a stochastic block model, storing data in sbm_data.graph.
 
   This function uses graph_tool.generate_sbm. Refer to that
@@ -299,12 +335,18 @@ def SimulateSbm(sbm_data,
     pi: iterable of non-zero community size relative proportions. Community i
       will be pi[i] / pi[j] times larger than community j.
     prop_mat: square, symmetric matrix of community edge count rates.
+    tau_mat: square, symmetric matrix of community transition probabilities.
     out_degs: Out-degree propensity for each node. If not provided, a constant
       value will be used. Note that the values will be normalized inside each
       group, if they are not already so.
     pi2: This is the pi vector for the vertices of type 2. Type 2 community k
       will be pi2[k] / pi[j] times larger than type 1 community j. Supplying
       this argument produces a heterogeneous model.
+    graph_memberships: (optional) list of integer node classes. If None, this
+      function will generate a random membership assignment. If provided, this
+      will be used as the initial node memberships. If `tau_mat` is not None,
+      this will be used as the memberships at time t for node transitioning,
+      and the output memberships will be at time t+1 (i.e. new memberships).
   Returns: (none)
   """
   if pi2 is None: pi2 = []
@@ -313,10 +355,18 @@ def SimulateSbm(sbm_data,
   pi /= np.sum(pi)
   if prop_mat.shape[0] != len(pi) or prop_mat.shape[1] != len(pi):
     raise ValueError("prop_mat must be k x k; k = len(pi1) + len(pi2)")
-  sbm_data.graph_memberships = _GenerateNodeMemberships(num_vertices, pi)
+  # <tadcsbm>
+  if graph_memberships is None:
+    graph_memberships = _GenerateNodeMemberships(num_vertices, pi)
+  sbm_data.graph_memberships = graph_memberships
+  if tau_mat is not None:
+     sbm_data.graph_memberships = _TransitionNodeMemberships(
+         sbm_data.graph_memberships,
+         tau_mat)
+  # </tacsbm>
   sbm_data.type1_clusters = sorted(list(set(sbm_data.graph_memberships)))
   if len(pi2) > 0:
-    sbm_data.cross_links = hsu.GetCrossLinks([k1, k2], 0, 1)
+    sbm_data.cross_links = GetCrossLinks([k1, k2], 0, 1)
     type1_clusters, type2_clusters = zip(*sbm_data.cross_links)
     sbm_data.type1_clusters = sorted(list(set(type1_clusters)))
     sbm_data.type2_clusters = sorted(list(set(type2_clusters)))
@@ -324,8 +374,10 @@ def SimulateSbm(sbm_data,
       num_edges, num_vertices, pi, prop_mat)
   sbm_data.graph = generation.generate_sbm(sbm_data.graph_memberships,
                                            edge_counts, out_degs)
-  graph_tool.stats.remove_self_loops(sbm_data.graph)
-  graph_tool.stats.remove_parallel_edges(sbm_data.graph)
+  # graph_tool.stats.remove_self_loops(sbm_data.graph)
+  # graph_tool.stats.remove_parallel_edges(sbm_data.graph)
+  generation.remove_self_loops(sbm_data.graph)
+  generation.remove_parallel_edges(sbm_data.graph)
   sbm_data.graph.reindex_edges()
 
 
