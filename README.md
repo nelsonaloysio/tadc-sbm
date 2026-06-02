@@ -1,8 +1,13 @@
 # TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model
 
+[![License](https://img.shields.io/github/license/nelsonaloysio/tadcsbm)](https://github.com/nelsonaloysio/tadcsbm/blob/main/LICENSE)
+[![PDF](https://img.shields.io/badge/pdf-Paper-red)](https://nelsonaloysio.github.io/files/tadcsbm2025.pdf)
+[![DOI](https://img.shields.io/badge/doi-10.1109/ISCC65549.2025.11326334-blue)](https://doi.org/10.1109/ISCC65549.2025.11326334)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadcsbm/blob/main/notebook.ipynb)
+
 This is the code repository for the accompanying paper:
 
-> Passos, N.A.R.A., Carlini, E., Trani, S. (2025). [TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model](https://nelsonaloysio.github.io/files/tadcsbm.preprint.pdf). 2025 IEEE Symposium on Computers and Communications (ISCC), Bologna, Italy, 2025, pp. 1-6.
+> Passos, N.A.R.A., Carlini, E., Trani, S. (2025). [TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model](https://ieeexplore.ieee.org/document/11326334). 2025 IEEE Symposium on Computers and Communications (ISCC), Bologna, Italy, 2025, pp. 1-6.
 
 ___
 
@@ -15,19 +20,33 @@ TADC-SBM is a synthetic dataset generator based on [Ghasemian et al. (2016)](htt
 where $\mathbf{B}$ is the block matrix describing the probability of an edge being created among nodes in each community and $\boldsymbol{\tau}$ is the transition matrix with the probabilities of nodes switching communities over time.
 Node- and edge-level attribute features are drawn from a multivariate distribution considering the node communities in either the first or the last graph snapshot, optionally representing hierarchical (nested) structures in the feature space.
 
-## Requires
+## Requirements
 
-Requirements can be installed from [pypi (requirements.txt)](requirements.txt) or using [conda (environment.yml)](environment.yml).
+Requirements can be installed from [PyPI (requirements.txt)](requirements.txt) or using [conda (environment.yml)](environment.yml).
 
 > The [graph-tool](https://graph-tool.skewed.de/) library must be available in the user space: `conda install -c conda-forge graph-tool`.
 
+It is **not** advised to install the environment from conda as-is (but you certainly may!). Instead, try the following, more flexible environment to solve, last tested with **Python 3.11**, but should work with more recent versions as well:
+
+```bash
+conda create -n tadcsbm -c conda-forge python=3.11 graph-tool  # tested with 2.96
+conda activate tadcsbm
+pip install -r requirements.txt
+```
+
+### Installation
+
+Run `pip install .` in the root directory of the repository to install the package and add it to your environment.
+
+A binary script `tadc-sbm` is included for command line usage, which can be run with `python -m tadc-sbm` or simply `tadc-sbm` if the package is installed. Note that it is not necessary to install the package to run the script.
+
 ## Usage
 
-To import the generator function:
+To import the generator function in your code:
 
 ```python
 from tadcsbm import tadcsbm_simulator
-sbm = tadc_simulator(...)
+sbm = tadcsbm_simulator(...)
 ```
 
 An interactive example may be found in the included [notebook](notebook.ipynb) file.
@@ -46,7 +65,8 @@ usage: tadc-sbm.py [-h] -n NUM_VERTICES -e NUM_EDGES -k COMMUNITIES
                    [--edge-feature-dim EDGE_FEATURE_DIM]
                    [--edge-center-distance EDGE_CENTER_DISTANCE]
                    [--edge-cluster-variance EDGE_CLUSTER_VARIANCE]
-                   [--fix-probabilities] [--no-reverse] [--uniform-all]
+                   [--no-reverse] [--uniform-all] [--dir OUTPUT_DIR]
+                   [--ext OUTPUT_EXT]
 
 options:
   -h, --help            show this help message and exit
@@ -58,7 +78,7 @@ options:
                         Number of communities
   -t SNAPSHOTS, --snapshots SNAPSHOTS
                         Number of snapshots
-  --eta ETA             Transition probability factor (0.0 to 1.0)
+  --eta ETA             Community stability factor (0.0 to 1.0)
   --gamma {0,1}         Fix transition probabilities (default: 0 for current
                         memberships)
   --beta EDGE_SAMPLING_RATE
@@ -101,7 +121,9 @@ To generate graphs with the same configuration used in the experimental evaluati
 
 > Varying the value of $\eta \in [0, 1]$ (`--eta`) produces snapshots with different community stability rates, while the value of $\gamma \in \\{0, 1\\}$ (`--gamma`) fixes the community transition probabilities for nodes in each snapshot.
 
-The [output](output) files are saved in NetworkX-compatible (GraphML), NumPy, or PyTorch Geometric format.
+The output files are saved in NetworkX-compatible (GraphML) and NumPy formats. See the included [examples](examples) directory for sample outputs used in the accompanying paper.
+
+> To convert to PyTorch Geometric data objects, simply load the GraphML files with `networkx.read_graphml` and use `torch_geometric.utils.from_networkx` to convert to PyG objects.
 
 ## Acknowledgements
 

@@ -23,8 +23,6 @@ from .simulations import (
     MatchType,
 )
 
-__version__ = "0.1.0"
-
 
 def tadcsbm_simulator(
     num_vertices,
@@ -129,6 +127,7 @@ def tadcsbm_simulator(
             p_to_q_ratio2=edge_probability_profile.p_to_q_ratio2,
             p_to_q_ratio_cross=edge_probability_profile.p_to_q_ratio_cross)
 
+    print("Simulating SBM...", end="\r")
     SimulateSbm(sbm,
                 num_vertices,
                 num_edges,
@@ -137,19 +136,22 @@ def tadcsbm_simulator(
                 out_degs,
                 pi2)
 
-    SimulateFeatures(
-                sbm,
-                feature_center_distance,
-                feature_dim,
-                num_feature_groups,
-                feature_group_match_type,
-                feature_cluster_variance,
-                feature_center_distance2,
-                feature_dim2,
-                feature_type_correlation,
-                feature_type_center_distance)
+    if feature_dim > 0:
+        print("Simulating node features...", end="\r")
+        SimulateFeatures(
+                    sbm,
+                    feature_center_distance,
+                    feature_dim,
+                    num_feature_groups,
+                    feature_group_match_type,
+                    feature_cluster_variance,
+                    feature_center_distance2,
+                    feature_dim2,
+                    feature_type_correlation,
+                    feature_type_center_distance)
 
     if edge_feature_dim > 0:
+        print("Simulating edge features...", end="\r")
         SimulateEdgeFeatures(
                 sbm,
                 edge_feature_dim,
@@ -161,6 +163,7 @@ def tadcsbm_simulator(
     graph_memberships = sbm.graph_memberships.copy()
 
     for t in range(snapshots):
+        print(f"Simulating snapshot {t+1}/{snapshots}...", end="\r")
         if not fixed_probabilities:
             graph_memberships = sbm.graph_memberships.copy()
         SimulateSbm(
@@ -173,16 +176,23 @@ def tadcsbm_simulator(
             pi2,
             tau_mat=tau_mat,
             graph_memberships=graph_memberships,
-            )
+        )
         graph.append(sbm.graph.copy())
         # counter = Counter(list(sbm.graph_memberships))
         # counter = {k: counter[k] for k in sorted(counter)}
-        # print(f"Snapshot {(snapshots-t-1) if reverse_snapshot_order else t}: {counter}")
+        # print(f"Snapshot {(snapshots-t-1) if reverse_snapshot_order else t}: {counter}", end="\r")
 
     if edge_sampling_rate < 1.0:
-        for g in graph:
-            for e in g.edges():
-                g.remove_edge(e) if np.random.random() < edge_sampling_rate else None
+        for t, g in enumerate(graph):
+            print(f"Edge sampling snapshot {t+1}/{snapshots}...", end="\r")
+            edges = list(g.edges())
+            if not edges:
+                continue
+            keep_mask = np.random.random(len(edges)) < edge_sampling_rate
+            if not np.all(keep_mask):
+                g.remove_edges_from(
+                    [edge for edge, keep in zip(edges, keep_mask) if not keep]
+                )
 
     sbm.graph = graph[::-1] if reverse_snapshot_order else graph
     return sbm

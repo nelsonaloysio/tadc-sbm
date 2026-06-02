@@ -13,8 +13,8 @@ lib/
 lib64/
 *.manifest
 MANIFEST
-notebook/
-!notebook/networkx-temporal.ipynb
+notebook.ipynb
+output/
 parts/
 pip-delete-this-directory.txt
 pip-log.txt
