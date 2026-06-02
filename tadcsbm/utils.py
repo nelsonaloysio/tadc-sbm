@@ -256,6 +256,5 @@ def gt_to_nx(graph, time=0):
     """Convert a graph-tool Graph to NetworkX."""
     G = nx.MultiGraph()
     G.add_nodes_from(graph.get_vertices())
-    for e in graph.edges():
-        G.add_edge(e.source(), e.target(), time=time)
+    G.add_edges_from([(e.source(), e.target(), {"time": time}) for e in graph.edges()])
     return G
