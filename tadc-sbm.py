@@ -67,7 +67,7 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--eta",
                         type=float,
                         default=1.0,
-                        help="Transition probability factor (0.0 to 1.0)")
+                        help="Community stability factor (0.0 to 1.0)")
 
     parser.add_argument("--gamma",
                         type=int,

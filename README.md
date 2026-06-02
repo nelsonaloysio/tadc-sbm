@@ -58,7 +58,7 @@ options:
                         Number of communities
   -t SNAPSHOTS, --snapshots SNAPSHOTS
                         Number of snapshots
-  --eta ETA             Transition probability factor (0.0 to 1.0)
+  --eta ETA             Community stability factor (0.0 to 1.0)
   --gamma {0,1}         Fix transition probabilities (default: 0 for current
                         memberships)
   --beta EDGE_SAMPLING_RATE
