@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tadc-sbm"
-version = "0.1.1"
-description = "Python package to build and manipulate dynamic NetworkX graphs."
+version = "0.1.2"
+description = "A Time-varying, Attributed, Degree-Corrected Stochastic Block Model"
 requires-python = ">=3.7"
 readme = {file = "README.md", content-type = "text/markdown"}
-# license = "BSD-2-Clause"
+# license = "Apache Software License 2.0"
 # license-files = ["LICENSE.md"]
-keywords = ["Network", "Graph", "Dynamic Graph", "Temporal Network"]
+keywords = ["Temporal Network", "Attributed Graph", "Graph Generative Model", "Graph Sampling"]
 authors = [
     {name = "Nelson Aloysio Reis de Almeida Passos", email = "nelson.reis@phd.unipi.it"}
 ]
