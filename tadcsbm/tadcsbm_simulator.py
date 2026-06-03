@@ -162,8 +162,8 @@ def tadcsbm_simulator(
     graph.append(sbm.graph.copy())
     graph_memberships = sbm.graph_memberships.copy()
 
-    for t in range(snapshots):
-        print(f"Simulating snapshot {t+1}/{snapshots}...", end="\r")
+    for t in range(snapshots-1):
+        print(f"Simulating snapshot {t+2}/{snapshots}...", end="\r")
         if not fixed_probabilities:
             graph_memberships = sbm.graph_memberships.copy()
         SimulateSbm(

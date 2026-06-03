@@ -135,14 +135,14 @@ In case this repository is useful for your research, kindly consider citing:
 
 ```
 @inproceedings{tadcsbm2025,
-    author = {Reis de Almeida Passos, Nelson Aloysio and Carlini, Emanuele and Trani, Salvatore},
-    booktitle={2025 IEEE Symposium on Computers and Communications (ISCC)},
-    title={TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model},
-    year={2025},
-    volume={},
-    number={},
-    pages={1-6},
-    keywords={Temporal Graphs, Community Detection, Stochastic Block Modeling, Graph Representation Learning},
-    doi={XX.XXXX/ISCCYYYYY.YYYY.YYYYYYYY}
+  author={Passos, Nelson A. R. A. and Carlini, Emanuele and Trani, Salvatore},
+  booktitle={2025 IEEE Symposium on Computers and Communications (ISCC)}, 
+  title={TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model}, 
+  year={2025},
+  volume={},
+  number={},
+  pages={1-6},
+  keywords={Representation learning;Systematics;Computational modeling;Perturbation methods;Stochastic processes;Transportation;Benchmark testing;Stability analysis;Recommender systems;Synthetic data;Temporal Graphs;Community Detection;Stochastic Block Modeling;Graph Representation Learning},
+  doi={10.1109/ISCC65549.2025.11326334}}
 }
 ```
