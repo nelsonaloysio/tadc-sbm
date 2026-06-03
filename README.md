@@ -36,7 +36,11 @@ pip install -r requirements.txt
 
 ### Installation
 
-Run `pip install .` in the root directory of the repository to install the package and add it to your environment.
+The package is available on test PyPI as `tadcsbm` and can be installed with:
+
+```bash
+pip install --index-url https://test.pypi.org/simple/ tadcsbm
+```
 
 A binary script `tadc-sbm` is included for command line usage, which can be run with `python -m tadc-sbm` or simply `tadc-sbm` if the package is installed. Note that it is not necessary to install the package to run the script.
 
@@ -136,8 +140,8 @@ In case this repository is useful for your research, kindly consider citing:
 ```
 @inproceedings{tadcsbm2025,
   author={Passos, Nelson A. R. A. and Carlini, Emanuele and Trani, Salvatore},
-  booktitle={2025 IEEE Symposium on Computers and Communications (ISCC)}, 
-  title={TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model}, 
+  booktitle={2025 IEEE Symposium on Computers and Communications (ISCC)},
+  title={TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model},
   year={2025},
   volume={},
   number={},
