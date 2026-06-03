@@ -1,9 +1,9 @@
 # TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model
 
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadcsbm/blob/main/notebook.ipynb)
 [![License](https://img.shields.io/github/license/nelsonaloysio/tadcsbm)](https://github.com/nelsonaloysio/tadcsbm/blob/main/LICENSE)
 [![PDF](https://img.shields.io/badge/pdf-Paper-red)](https://nelsonaloysio.github.io/files/tadcsbm2025.pdf)
 [![DOI](https://img.shields.io/badge/doi-10.1109/ISCC65549.2025.11326334-blue)](https://doi.org/10.1109/ISCC65549.2025.11326334)
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadcsbm/blob/main/notebook.ipynb)
 
 This is the code repository for the accompanying paper:
 
@@ -26,7 +26,7 @@ Requirements can be installed from [PyPI (requirements.txt)](requirements.txt) o
 
 > The [graph-tool](https://graph-tool.skewed.de/) library must be available in the user space: `conda install -c conda-forge graph-tool`.
 
-It is **not** advised to install the environment from conda as-is (but you certainly may!). Instead, try the following, more flexible environment to solve, last tested with **Python 3.11**, but should work with more recent versions as well:
+It is **not** advised to install the environment from conda as-is (but you certainly may!). Instead, try the following, more flexible environment to solve. Last tested with **Python 3.11** (but should work recent versions as well):
 
 ```bash
 conda create -n tadcsbm -c conda-forge python=3.11 graph-tool  # tested with 2.96
@@ -123,11 +123,14 @@ To generate graphs with the same configuration used in the experimental evaluati
               --feature-center 6.0
 ```
 
+See the included [examples](examples) directory for sample outputs used in the accompanying paper.
+
 > Varying the value of $\eta \in [0, 1]$ (`--eta`) produces snapshots with different community stability rates, while the value of $\gamma \in \\{0, 1\\}$ (`--gamma`) fixes the community transition probabilities for nodes in each snapshot.
 
-The output files are saved in NetworkX-compatible (GraphML) and NumPy formats. See the included [examples](examples) directory for sample outputs used in the accompanying paper.
+### Data conversion
 
-> To convert to PyTorch Geometric data objects, simply load the GraphML files with `networkx.read_graphml` and use `torch_geometric.utils.from_networkx` to convert to PyG objects.
+Resulting output is saved in compressed NetworkX-compatible and NumPy formats, and may be opened with a number of libraries and tools.
+See also: the [`convert`](https://networkx-temporal.readthedocs.io/en/stable/api/utils.html#networkx_temporal.utils.convert.convert) and [`read_graph`](https://networkx-temporal.readthedocs.io/en/stable/api/readwrite.html#networkx_temporal.readwrite.read_graph) functions from NetworkX-Temporal.
 
 ## Acknowledgements
 
