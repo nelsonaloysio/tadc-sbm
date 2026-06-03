@@ -257,4 +257,5 @@ def gt_to_nx(graph, time=0):
     G = nx.MultiGraph()
     G.add_nodes_from(graph.get_vertices())
     G.add_edges_from([(e.source(), e.target(), {"time": time}) for e in graph.edges()])
+    G = nx.relabel_nodes(G, {v: int(v) for v in G.nodes()})
     return G
