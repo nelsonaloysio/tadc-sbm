@@ -12,6 +12,14 @@
 
 # from collections import Counter
 
+try:
+    import graph_tool
+except ImportError as e:
+    raise ImportError(
+      "graph-tool is required to run the TADC-SBM simulator; for installation instructions, see:\n"
+      "> https://graph-tool.skewed.de/installation.html"
+    ) from e
+
 import numpy as np
 
 from .simulations import (
