@@ -20,29 +20,30 @@ TADC-SBM is a synthetic dataset generator based on [Ghasemian et al. (2016)](htt
 where $\mathbf{B}$ is the block matrix describing the probability of an edge being created among nodes in each community and $\boldsymbol{\tau}$ is the transition matrix with the probabilities of nodes switching communities over time.
 Node- and edge-level attribute features are drawn from a multivariate distribution considering the node communities in either the first or the last graph snapshot, optionally representing hierarchical (nested) structures in the feature space.
 
-## Requirements
+## Install
 
-Requirements can be installed from [PyPI (requirements.txt)](requirements.txt) or using [conda (environment.yml)](environment.yml).
+The package is available on PyPI as `tadcsbm` and can be installed with:
+
+```bash
+pip install tadcsbm
+```
+
+A binary script `tadc-sbm` is included for command line usage, which can be run with `python -m tadc-sbm` or simply `tadc-sbm` if the package is installed. Note that it is not necessary to install the package to run the script.
+
+### Requirements
+
+Requirements may be installed from [PyPI (requirements.txt)](requirements.txt) or using [conda (environment.yml)](environment.yml).
 
 > The [graph-tool](https://graph-tool.skewed.de/) library must be available in the user space: `conda install -c conda-forge graph-tool`.
+> Alternatively, see the [graph-tool documentation](https://graph-tool.skewed.de) for other platforms and package managers, including Docker and Homebrew.
 
-It is **not** advised to install the environment from conda as-is (but you certainly may!). Instead, try the following, more flexible environment to solve. Last tested with **Python 3.11** (but should work recent versions as well):
+It is **not** advised to install the [conda environment](environment.yml) as-is (but you certainly may!). Instead, try the following, more flexible environment to solve. Last tested with **Python 3.11** (but should work recent versions as well):
 
 ```bash
 conda create -n tadcsbm -c conda-forge python=3.11 graph-tool  # tested with 2.96
 conda activate tadcsbm
 pip install -r requirements.txt
 ```
-
-### Installation
-
-The package is available on test PyPI as `tadcsbm` and can be installed with:
-
-```bash
-pip install --index-url https://test.pypi.org/simple/ tadcsbm
-```
-
-A binary script `tadc-sbm` is included for command line usage, which can be run with `python -m tadc-sbm` or simply `tadc-sbm` if the package is installed. Note that it is not necessary to install the package to run the script.
 
 ## Usage
 
@@ -150,6 +151,6 @@ In case this repository is useful for your research, kindly consider citing:
   number={},
   pages={1-6},
   keywords={Representation learning;Systematics;Computational modeling;Perturbation methods;Stochastic processes;Transportation;Benchmark testing;Stability analysis;Recommender systems;Synthetic data;Temporal Graphs;Community Detection;Stochastic Block Modeling;Graph Representation Learning},
-  doi={10.1109/ISCC65549.2025.11326334}}
+  doi={10.1109/ISCC65549.2025.11326334}
 }
 ```
