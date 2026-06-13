@@ -68,7 +68,7 @@ usage: tadc-sbm [-h] -n NUM_VERTICES -e NUM_EDGES -k COMMUNITIES
                 [--beta EDGE_SAMPLING_RATE] [--feature-dim FEATURE_DIM]
                 [--feature-center-distance FEATURE_CENTER_DISTANCE]
                 [--feature-cluster-variance FEATURE_CLUSTER_VARIANCE]
-                [--feature-groups hat_k] [--edge-feature-dim EDGE_FEATURE_DIM]
+                [--feature-groups k_hat] [--edge-feature-dim EDGE_FEATURE_DIM]
                 [--edge-center-distance EDGE_CENTER_DISTANCE]
                 [--edge-cluster-variance EDGE_CLUSTER_VARIANCE]
                 [--reverse-order] [--uniform-all] [--dir OUTPUT_DIR]
@@ -100,7 +100,7 @@ options:
                         Distance between feature clusters
   --feature-cluster-variance FEATURE_CLUSTER_VARIANCE
                         Variance of feature clusters (default: 1.0)
-  --feature-groups hat_k
+  --feature-groups k_hat
                         Number of feature groups (default: k communities)
   --edge-feature-dim EDGE_FEATURE_DIM
                         Dimensionality of edge features

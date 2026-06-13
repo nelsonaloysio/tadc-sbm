@@ -100,7 +100,7 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--feature-groups",
                         type=int,
                         default=None,
-                        metavar="hat_k",
+                        metavar="k_hat",
                         help="Number of feature groups (default: k communities)")
 
     parser.add_argument("--edge-feature-dim",
