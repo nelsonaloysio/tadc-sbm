@@ -16,7 +16,6 @@ from os import mkdir
 from os.path import isdir
 from sys import argv
 
-import networkx as nx
 import networkx_temporal as tx
 import numpy as np
 
@@ -140,6 +139,11 @@ def getargs(args: list = argv[1:]):
                         default="gexf",
                         help="Extension for output files (default: 'gexf')")
 
+    parser.add_argument("--random-seed", "--seed",
+                        type=int,
+                        default=None,
+                        help="Random seed for reproducible results")
+
     parser.add_argument("--silent",
                         action="store_false",
                         dest="verbose",
@@ -178,6 +182,7 @@ def main():
         fixed_probabilities=args.fixed_probabilities,
         reverse_snapshot_order=args.reverse_snapshot_order,
         edge_sampling_rate=args.edge_sampling_rate,
+        random_seed=args.random_seed,
     )
 
     # Compose graph-tool graphs as a single NetworkX multigraph.

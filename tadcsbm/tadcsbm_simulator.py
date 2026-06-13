@@ -13,7 +13,7 @@
 import numpy as np
 
 try:
-    import graph_tool
+    import graph_tool as gt
 except ImportError as e:
     raise ImportError(
       "graph-tool is required to run the TADC-SBM simulator; for installation instructions, see:\n"
@@ -55,6 +55,7 @@ def tadcsbm_simulator(
     reverse_snapshot_order = True,
     fixed_probabilities = False,
     edge_sampling_rate = 1.0,
+    random_seed = None,
 ):
     """Generates stochastic block model (SBM) with node features.
 
@@ -112,6 +113,7 @@ def tadcsbm_simulator(
             num_edges * 0.5, and the actual number of edges will be sampled from a
             binomial distribution with that expected number of edges. This is useful
             for generating sparser graphs and benchmarking link prediction models.
+        random_seed: (int) random seed for reproducibility.
 
     Returns:
         result: a StochasticBlockModel data class.
@@ -119,6 +121,10 @@ def tadcsbm_simulator(
     Raises:
         ValueError: if neither of prop_mat or edge_probability_profile are provided.
     """
+    if random_seed is not None:
+        gt.seed_rng(random_seed)
+        np.random.seed(random_seed)
+
     sbm = StochasticBlockModel()
 
     if prop_mat is None and edge_probability_profile is None:
