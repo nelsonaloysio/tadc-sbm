@@ -141,18 +141,20 @@ To generate graphs with the same configuration used in the experimental evaluati
 The following output is printed at the end of the simulation, unless the `--silent` flag is set:
 
 ```none
-TemporalMultiGraph (t=8) with 1024 nodes and 39334 edges
-Snapshot 1/8: 1024 nodes, 4871 edges, communities: [123 119 124 124 127 127 136 144]
-Snapshot 2/8: 1024 nodes, 4996 edges, communities: [124 118 116 139 117 123 143 144]
-Snapshot 3/8: 1024 nodes, 4827 edges, communities: [122 131 115 141 116 127 123 149]
-Snapshot 4/8: 1024 nodes, 5008 edges, communities: [115 123 125 130 115 117 145 154]
-Snapshot 5/8: 1024 nodes, 4950 edges, communities: [112 134 135 112 118 123 143 147]
-Snapshot 6/8: 1024 nodes, 4964 edges, communities: [113 129 128 111 125 125 154 139]
-Snapshot 7/8: 1024 nodes, 4846 edges, communities: [118 123 136 133 119 128 133 134]
-Snapshot 8/8: 1024 nodes, 4872 edges, communities: [128 128 128 128 128 128 128 128]
+TemporalMultiGraph (t=8) with 1024 nodes and 39302 edges
+- Snapshot 1/8: 1024 nodes, 4863 edges, communities: [131 130 134 125 114 160 105 125], within-/between-edge ratio: 8.92
+- Snapshot 2/8: 1024 nodes, 4953 edges, communities: [125 135 137 119 119 144 112 133], within-/between-edge ratio: 8.60
+- Snapshot 3/8: 1024 nodes, 4852 edges, communities: [115 146 124 119 112 139 132 137], within-/between-edge ratio: 8.02
+- Snapshot 4/8: 1024 nodes, 4853 edges, communities: [127 141 129 125 115 140 128 119], within-/between-edge ratio: 8.76
+- Snapshot 5/8: 1024 nodes, 5034 edges, communities: [122 143 137 118 122 140 130 112], within-/between-edge ratio: 9.23
+- Snapshot 6/8: 1024 nodes, 5059 edges, communities: [118 132 142 135 126 137 130 104], within-/between-edge ratio: 7.91
+- Snapshot 7/8: 1024 nodes, 4908 edges, communities: [120 127 145 134 134 131 120 113], within-/between-edge ratio: 8.19
+- Snapshot 8/8: 1024 nodes, 4780 edges, communities: [128 128 128 128 128 128 128 128], within-/between-edge ratio: 8.70
 Total nodes across snapshots: 8192
-Total edges across snapshots: 39334
-Total transitions across snapshots: 1844 (25.73%)
+Total edges across snapshots: 39302
+Total transitions across snapshots: 1794 (25.03%)
+Average within/between ratio across snapshots: 8.54
+Expected within/between ratio (p/q) overall: 9.00
 ```
 
 See the included [examples](examples) directory for sample outputs used in the accompanying paper.

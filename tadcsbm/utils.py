@@ -44,11 +44,11 @@ def generate_block_matrix(
     :param q: Edge probability among nodes in different communities.
     """
     assert type(communities) == int and communities > 1,\
-        "Argument `communities` must be an integer larger than 1."
-    assert p is None or (type(p) == float and 0 <= p <= 1),\
-        "Argument `p` must be a float between 0 and 1."
-    assert q is None or (type(q) == float and 0 <= q <= 1),\
-        "Argument `q` must be a float between 0 and 1."
+        "Argument `communities` expects an integer larger than 1."
+    assert p is None or (type(p) in (int, float) and 0 <= p <= 1),\
+        "Argument `p` expects a float or integer between 0 and 1."
+    assert q is None or (type(q) in (int, float) and 0 <= q <= 1),\
+        "Argument `q` expects a float or integer between 0 and 1."
 
     if p is None and q is None:
         p = (1 - (q or 0)) / communities
@@ -110,7 +110,7 @@ def generate_transition_matrix(
     eta = 1/communities if eta is None else eta
 
     assert type(eta) in (int, float) and 0 <= eta <= 1,\
-        "Argument `eta` must be a float or integer between 0 and 1."
+        "Argument `eta` expects a float or integer between 0 and 1."
 
     if uniform_all:
         eta += ((1-eta)/communities)
@@ -172,13 +172,13 @@ def generate_degree_vector(
     assert (type(nodes) == int and nodes > 0) or (type(nodes) == list and len(nodes) > 0),\
         "Argument `nodes` expects a positive integer or a list of integers."
     assert min_degree is None or type(min_degree) == int and min_degree >= 0,\
-        "Argument `min_degree` must be a non-negative integer."
+        "Argument `min_degree` expects a non-negative integer."
     assert max_degree is None or type(max_degree) == int and max_degree >= min_degree,\
-        "Argument `max_degree` must be a non-negative integer >= `min_degree`."
+        "Argument `max_degree` expects a non-negative integer >= `min_degree`."
     assert alpha is None or type(alpha) in (int, float) and alpha > 0,\
-        "Argument `alpha` must be a positive integer or float."
+        "Argument `alpha` expects a positive integer or float."
     assert shuffle is None or type(shuffle) == bool,\
-        "Argument `shuffle` must be a boolean."
+        "Argument `shuffle` expects a boolean."
 
     if type(nodes) == int:
         nodes = [nodes]
@@ -236,11 +236,11 @@ def generate_community_vector(
     assert (type(nodes) == int and nodes > 0) or (type(nodes) == list and len(nodes) > 0),\
         "Argument `nodes` expects a positive integer or a list of integers."
     assert type(nodes) != list or all(type(c) == int and c >= 0 for c in nodes),\
-        "Argument `nodes` must be a list of zero or positive integers."
+        "Argument `nodes` expects a list of zero or positive integers."
     assert type(communities) != int or communities > 0,\
-        "Argument `communities` must be a positive integer."
+        "Argument `communities` expects a positive integer."
     assert shuffle is None or type(shuffle) == bool,\
-        "Argument `shuffle` must be a boolean."
+        "Argument `shuffle` expects a boolean."
 
     community_vector = np.array(
         [_ for _ in [[c]*nodes for c in range(communities)] for _ in _]
