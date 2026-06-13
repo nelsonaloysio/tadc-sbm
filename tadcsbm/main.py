@@ -19,16 +19,13 @@ from sys import argv
 import networkx as nx
 import networkx_temporal as tx
 import numpy as np
-# import torch
-# from torch_geometric.utils import from_networkx
 
 from .tadcsbm_simulator import tadcsbm_simulator
 from .utils import (
     generate_block_matrix,
     generate_transition_matrix,
-    # generate_degree_vector,
     generate_community_vector,
-    gt_to_nx,
+    gt_to_nx_temporal,
 )
 
 
@@ -57,13 +54,13 @@ def getargs(args: list = argv[1:]):
                         default=1,
                         help="Number of snapshots")
 
-    # parser.add_argument("--min-deg",
-    #                     type=int,
-    #                     help="Minimum expected vertex degree")
+    parser.add_argument("-p", "--intra-probability",
+                        type=float,
+                        help="Intra-community edge probability")
 
-    # parser.add_argument("--max-deg",
-    #                     type=int,
-    #                     help="Maximum expected vertex degree")
+    parser.add_argument("-q", "--inter-probability",
+                        type=float,
+                        help="Inter-community edge probability")
 
     parser.add_argument("--eta",
                         type=float,
@@ -93,19 +90,17 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--feature-center-distance",
                         type=float,
                         default=None,
-                        dest="sigma",
                         help="Distance between feature clusters")
 
     parser.add_argument("--feature-cluster-variance",
                         type=float,
                         default=1.0,
-                        dest="sigma_i",
                         help="Variance of feature clusters (default: 1.0)")
 
     parser.add_argument("--feature-groups",
                         type=int,
                         default=None,
-                        dest="hat_k",
+                        metavar="hat_k",
                         help="Number of feature groups (default: k communities)")
 
     parser.add_argument("--edge-feature-dim",
@@ -122,11 +117,11 @@ def getargs(args: list = argv[1:]):
                         default=1.0,
                         help="Variance of edge feature clusters (default: 1.0)")
 
-    parser.add_argument("--no-reverse",
-                        action="store_false",
+    parser.add_argument("--reverse-order",
+                        action="store_true",
                         dest="reverse_snapshot_order",
-                        help="Keep generation order of snapshots (default: reversed, so " \
-                             "initial ground truths are in the last snapshot)")
+                        help="Reverse generation order of snapshots (i.e., so the " \
+                             "initial ground truths correspond to the last snapshot)")
 
     parser.add_argument("--uniform-all",
                         action="store_true",
@@ -142,8 +137,13 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--ext", "--output-ext",
                         type=str,
                         dest="output_ext",
-                        default="graphml",
-                        help="Extension for output files (default: 'graphml')")
+                        default="gexf",
+                        help="Extension for output files (default: 'gexf')")
+
+    parser.add_argument("--silent",
+                        action="store_false",
+                        dest="verbose",
+                        help="Suppress verbose output at the end of simulation")
 
     return parser.parse_args(args)
 
@@ -154,16 +154,17 @@ def main():
     if not isdir(args.output_dir):
         mkdir(args.output_dir)
 
-    mat = generate_block_matrix(args.communities)
-    tau = generate_transition_matrix(args.communities, args.eta, uniform_all=args.uniform_all)
-    # deg = generate_degree_vector(num_vertices, min_deg, max_deg, shuffle=True)
-    z = generate_community_vector(args.num_vertices, args.communities, shuffle=False)
+    mat = generate_block_matrix(
+        args.communities, p=args.intra_probability, q=args.inter_probability)
+    tau = generate_transition_matrix(
+        args.communities, args.eta, uniform_all=args.uniform_all)
+    z = generate_community_vector(
+        args.num_vertices, args.communities, shuffle=False)
 
     sbm = tadcsbm_simulator(
         snapshots=args.snapshots,
         num_vertices=args.num_vertices,
         num_edges=args.num_edges,
-        # num_edges=sum(deg),
         pi=[v/len(z) for _, v in Counter(z).items()],
         prop_mat=mat,
         tau_mat=tau,
@@ -181,13 +182,11 @@ def main():
 
     # Compose graph-tool graphs as a single NetworkX multigraph.
     print("Composing graph snapshots...", end="\r")
-    TG = tx.from_snapshots([gt_to_nx(graph, time=t) for t, graph in enumerate(sbm.graph)])
+    TG = gt_to_nx_temporal(sbm.graph)
 
-    # Set node attributes for community memberships and save to disk.
-    print("Setting node memberships...", end="\r")
-    list(nx.set_node_attributes(G, {v: y for v, y in zip(G.nodes(), sbm.graph_memberships)}, "y") for G in TG)
-
-    # Save node and edge features as NumPy arrays.
+    # Save graph as compressed file and node and edge features as NumPy arrays.
+    print("Saving graph snapshots...", end="\r")
+    tx.write_graph(TG, f"{args.output_dir}/graphs.{args.output_ext}.zip")
     if args.feature_dim > 0:
         print("Saving node features...", end="\r")
         np.save(f"{args.output_dir}/features_node.npy", sbm.node_features1)
@@ -195,20 +194,16 @@ def main():
         print("Saving edge features...", end="\r")
         np.save(f"{args.output_dir}/features_edge.npy", sbm.edge_features)
 
-    # Save the composed graph to disk.
-    print(f"Saving graph files to {args.output_dir}...", end="\r")
-    tx.write_graph(TG, f"{args.output_dir}/graphs.{args.output_ext}.zip")
-    tx.write_graph(TG.to_static(), f"{args.output_dir}/graph.{args.output_ext}.zip")
     print(TG)
 
-    # Set node and edge attributes in the NetworkX graph.
-    # print("Setting node and edge attributes...", end="\r")
-    # if feature_dim > 0:
-    #     nx.set_node_attributes(G, {v: x for v, x in zip(G.nodes(), sbm.node_features1)}, "x")
-    # if edge_feature_dim > 0:
-    #     nx.set_edge_attributes(G, {e: x for e, x in zip(G.edges(), sbm.edge_features)}, "edge_attr")
-
-    # Save as PyTorch Geometric data object.
-    # data = from_networkx(G)
-    # torch.save(data, f"{output_dir}/data.pt")
-    # print(data)
+    if args.verbose:
+        V, E, T = 0, 0, 0
+        for i, (g, memberships) in enumerate(zip(sbm.graph, sbm.graph_memberships)):
+            V += g.num_vertices()
+            E += g.num_edges()
+            T += np.sum(memberships != sbm.graph_memberships[i-1]) if i > 0 else 0
+            print(f"Snapshot {i+1}/{len(sbm.graph)}: {g.num_vertices()} nodes, {g.num_edges()} edges, " \
+                  f"communities: {np.bincount(memberships)}")
+        print(f"Total nodes across snapshots: {V}",
+              f"Total edges across snapshots: {E}",
+              f"Total transitions across snapshots: {T} ({T/(V-g.num_vertices()):.2%})", sep="\n")
