@@ -61,17 +61,17 @@ An interactive example may be found in the included [notebook](notebook.ipynb) f
 A command line interface is included to stremaline graph generation:
 
 ```none
-usage: tadc-sbm.py [-h] -n NUM_VERTICES -e NUM_EDGES -k COMMUNITIES
-                   [-t SNAPSHOTS] [--eta ETA] [--gamma {0,1}]
-                   [--beta EDGE_SAMPLING_RATE] [--feature-dim FEATURE_DIM]
-                   [--feature-center-distance FEATURE_CENTER_DISTANCE]
-                   [--feature-cluster-variance FEATURE_CLUSTER_VARIANCE]
-                   [--feature-groups FEATURE_GROUPS]
-                   [--edge-feature-dim EDGE_FEATURE_DIM]
-                   [--edge-center-distance EDGE_CENTER_DISTANCE]
-                   [--edge-cluster-variance EDGE_CLUSTER_VARIANCE]
-                   [--no-reverse] [--uniform-all] [--dir OUTPUT_DIR]
-                   [--ext OUTPUT_EXT]
+usage: tadc-sbm [-h] -n NUM_VERTICES -e NUM_EDGES -k COMMUNITIES
+                [-t SNAPSHOTS] [-p INTRA_PROBABILITY] [-q INTER_PROBABILITY]
+                [--eta COMMUNITY_STABILITY] [--gamma {0,1}]
+                [--beta EDGE_SAMPLING_RATE] [--feature-dim FEATURE_DIM]
+                [--feature-center-distance FEATURE_CENTER_DISTANCE]
+                [--feature-cluster-variance FEATURE_CLUSTER_VARIANCE]
+                [--feature-groups hat_k] [--edge-feature-dim EDGE_FEATURE_DIM]
+                [--edge-center-distance EDGE_CENTER_DISTANCE]
+                [--edge-cluster-variance EDGE_CLUSTER_VARIANCE]
+                [--reverse-order] [--uniform-all] [--dir OUTPUT_DIR]
+                [--ext OUTPUT_EXT] [--random-seed RANDOM_SEED] [--silent]
 
 options:
   -h, --help            show this help message and exit
@@ -83,9 +83,14 @@ options:
                         Number of communities
   -t SNAPSHOTS, --snapshots SNAPSHOTS
                         Number of snapshots
-  --eta ETA             Community stability factor (0.0 to 1.0)
-  --gamma {0,1}         Fix transition probabilities (default: 0 for current
-                        memberships)
+  -p INTRA_PROBABILITY, --intra-probability INTRA_PROBABILITY
+                        Intra-community edge probability
+  -q INTER_PROBABILITY, --inter-probability INTER_PROBABILITY
+                        Inter-community edge probability
+  --eta COMMUNITY_STABILITY
+                        Community stability factor (0.0 to 1.0, default: 1.0)
+  --gamma {0,1}         Set transition probabilities based on initial ground
+                        truths (0, default) or current (1) node memberships
   --beta EDGE_SAMPLING_RATE
                         Edge sampling rate (0.0 to 1.0)
   --feature-dim FEATURE_DIM
@@ -94,34 +99,59 @@ options:
                         Distance between feature clusters
   --feature-cluster-variance FEATURE_CLUSTER_VARIANCE
                         Variance of feature clusters (default: 1.0)
-  --feature-groups FEATURE_GROUPS
-                        Number of feature groups (default: k)
+  --feature-groups hat_k
+                        Number of feature groups (default: k communities)
   --edge-feature-dim EDGE_FEATURE_DIM
                         Dimensionality of edge features
   --edge-center-distance EDGE_CENTER_DISTANCE
                         Distance between edge feature clusters
   --edge-cluster-variance EDGE_CLUSTER_VARIANCE
                         Variance of edge feature clusters (default: 1.0)
-  --fix-probabilities   Use fixed transition probabilities (default: False)
-  --no-reverse          Keep the generation order of snapshots (default:
-                        reversed)
-  --uniform-all         Uniform transition probabilities (i.e., including
-                        current community)
+  --reverse-order       Reverse generation order of snapshots (i.e., so the
+                        initial ground truths correspond to the last snapshot)
+  --uniform-all         Uniform transition probabilities (including current
+                        community, i.e., like in Ghasemian et al. 2016)
+  --dir OUTPUT_DIR, --output-dir OUTPUT_DIR
+                        Directory to save output files (default: 'output')
+  --ext OUTPUT_EXT, --output-ext OUTPUT_EXT
+                        Extension for output files (default: 'gexf')
+  --random-seed RANDOM_SEED, --seed RANDOM_SEED
+                        Random seed for reproducible results
+  --silent              Suppress verbose output at the end of simulation
 ```
 
 ### Example
 
 To generate graphs with the same configuration used in the experimental evaluation of the paper:
 
-```none
+```bash
 ./tadc-sbm.py --communities 8 \
               --snapshots 8 \
               --num-vertices 1024 \
               --num-edges 10240 \
-              --eta 1 \
+              --intra-prob 0.9 \
+              --eta 0.75 \
               --gamma 0 \
               --feature-dim 32 \
-              --feature-center 6.0
+              --feature-center 6.0 \
+              --reverse-order
+```
+
+The following output is printed at the end of the simulation, unless the `--silent` flag is set:
+
+```none
+TemporalMultiGraph (t=8) with 1024 nodes and 39334 edges
+Snapshot 1/8: 1024 nodes, 4871 edges, communities: [123 119 124 124 127 127 136 144]
+Snapshot 2/8: 1024 nodes, 4996 edges, communities: [124 118 116 139 117 123 143 144]
+Snapshot 3/8: 1024 nodes, 4827 edges, communities: [122 131 115 141 116 127 123 149]
+Snapshot 4/8: 1024 nodes, 5008 edges, communities: [115 123 125 130 115 117 145 154]
+Snapshot 5/8: 1024 nodes, 4950 edges, communities: [112 134 135 112 118 123 143 147]
+Snapshot 6/8: 1024 nodes, 4964 edges, communities: [113 129 128 111 125 125 154 139]
+Snapshot 7/8: 1024 nodes, 4846 edges, communities: [118 123 136 133 119 128 133 134]
+Snapshot 8/8: 1024 nodes, 4872 edges, communities: [128 128 128 128 128 128 128 128]
+Total nodes across snapshots: 8192
+Total edges across snapshots: 39334
+Total transitions across snapshots: 1844 (25.73%)
 ```
 
 See the included [examples](examples) directory for sample outputs used in the accompanying paper.
@@ -130,8 +160,8 @@ See the included [examples](examples) directory for sample outputs used in the a
 
 ### Data conversion
 
-Resulting output is saved in compressed NetworkX-compatible and NumPy formats, and may be opened with a number of libraries and tools.
-See also: the [`convert`](https://networkx-temporal.readthedocs.io/en/stable/api/utils.html#networkx_temporal.utils.convert.convert) and [`read_graph`](https://networkx-temporal.readthedocs.io/en/stable/api/readwrite.html#networkx_temporal.readwrite.read_graph) functions from NetworkX-Temporal.
+Resulting output is saved in compressed [NetworkX](https://networkx.org)-compatible and [NumPy](https://numpy.org) formats, and may be opened with a number of libraries and tools.
+See also: the [`convert`](https://networkx-temporal.readthedocs.io/en/stable/api/utils.html#networkx_temporal.utils.convert.convert) and [`read_graph`](https://networkx-temporal.readthedocs.io/en/stable/api/readwrite.html#networkx_temporal.readwrite.read_graph) functions from [NetworkX-Temporal](https://networkx-temporal.org).
 
 ## Acknowledgements
 
