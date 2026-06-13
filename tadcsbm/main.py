@@ -67,15 +67,17 @@ def getargs(args: list = argv[1:]):
 
     parser.add_argument("--eta",
                         type=float,
+                        metavar="COMMUNITY_STABILITY",
                         default=1.0,
-                        help="Community stability factor (0.0 to 1.0)")
+                        help="Community stability factor (0.0 to 1.0, default: 1.0)")
 
     parser.add_argument("--gamma",
                         type=int,
                         choices=[0, 1],
                         default=0,
                         dest="fixed_probabilities",
-                        help="Fix transition probabilities (default: 0 for current memberships)")
+                        help="Set transition probabilities based on initial "
+                              "ground truths (0, default) or current (1) node memberships")
 
     parser.add_argument("--beta",
                         type=float,
@@ -91,17 +93,20 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--feature-center-distance",
                         type=float,
                         default=None,
+                        dest="sigma",
                         help="Distance between feature clusters")
 
     parser.add_argument("--feature-cluster-variance",
                         type=float,
                         default=1.0,
+                        dest="sigma_i",
                         help="Variance of feature clusters (default: 1.0)")
 
     parser.add_argument("--feature-groups",
                         type=int,
                         default=None,
-                        help="Number of feature groups (default: k)")
+                        dest="hat_k",
+                        help="Number of feature groups (default: k communities)")
 
     parser.add_argument("--edge-feature-dim",
                         type=int,
@@ -120,11 +125,13 @@ def getargs(args: list = argv[1:]):
     parser.add_argument("--no-reverse",
                         action="store_false",
                         dest="reverse_snapshot_order",
-                        help="Keep the generation order of snapshots (default: reversed)")
+                        help="Keep generation order of snapshots (default: reversed, so " \
+                             "initial ground truths are in the last snapshot)")
 
     parser.add_argument("--uniform-all",
                         action="store_true",
-                        help="Uniform transition probabilities (i.e., including current community)")
+                        help="Uniform transition probabilities (including current community, "
+                              "i.e., like in Ghasemian et al. 2016)")
 
     parser.add_argument("--dir", "--output-dir",
                         type=str,
