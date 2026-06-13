@@ -62,6 +62,11 @@ def generate_block_matrix(
     for i in range(communities):
         for j in range(communities):
             B[i, j] = p if i == j else (q/(communities - 1))
+
+    # Normalize B so rows sum to 1.
+    if not np.allclose(B.sum(axis=1), 1):
+        B = B / B.sum(axis=1, keepdims=True)
+
     return B
 
 
