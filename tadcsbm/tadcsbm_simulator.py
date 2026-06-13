@@ -122,6 +122,8 @@ def tadcsbm_simulator(
         ValueError: if neither of prop_mat or edge_probability_profile are provided.
     """
     if random_seed is not None:
+        assert type(random_seed) == int and random_seed > 0,\
+            "random_seed must be a positive integer if set."
         gt.seed_rng(random_seed)
         np.random.seed(random_seed)
 
