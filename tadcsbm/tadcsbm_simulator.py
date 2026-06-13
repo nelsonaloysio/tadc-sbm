@@ -10,7 +10,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# from collections import Counter
+import numpy as np
 
 try:
     import graph_tool
@@ -19,8 +19,6 @@ except ImportError as e:
       "graph-tool is required to run the TADC-SBM simulator; for installation instructions, see:\n"
       "> https://graph-tool.skewed.de/installation.html"
     ) from e
-
-import numpy as np
 
 from .simulations import (
     StochasticBlockModel,
@@ -144,6 +142,11 @@ def tadcsbm_simulator(
                 out_degs,
                 pi2)
 
+    sbm.graph.vp["community"] = sbm.graph.new_vp(
+        "int32_t",
+        vals=np.asarray(sbm.graph_memberships, dtype=np.int32)
+    )
+
     if feature_dim > 0:
         print("Simulating node features...", end="\r")
         SimulateFeatures(
@@ -168,12 +171,11 @@ def tadcsbm_simulator(
 
     graph = []
     graph.append(sbm.graph.copy())
-    graph_memberships = sbm.graph_memberships.copy()
+    graph_memberships = [sbm.graph_memberships.copy()]
 
+    # Simulate snapshots with node transitions according to fixed_probabiltiies (gamma parameter).
     for t in range(snapshots-1):
         print(f"Simulating snapshot {t+2}/{snapshots}...", end="\r")
-        if not fixed_probabilities:
-            graph_memberships = sbm.graph_memberships.copy()
         SimulateSbm(
             sbm,
             num_vertices,
@@ -183,24 +185,50 @@ def tadcsbm_simulator(
             out_degs,
             pi2,
             tau_mat=tau_mat,
-            graph_memberships=graph_memberships,
+            graph_memberships=graph_memberships[0 if fixed_probabilities else -1],
         )
+        # Store graph and memberships for current snapshot.
         graph.append(sbm.graph.copy())
-        # counter = Counter(list(sbm.graph_memberships))
-        # counter = {k: counter[k] for k in sorted(counter)}
-        # print(f"Snapshot {(snapshots-t-1) if reverse_snapshot_order else t}: {counter}", end="\r")
+        graph_memberships.append(sbm.graph_memberships.copy())
+        # Store community memberships as vertex property maps in graph object.
+        graph[-1].vp["community"] = graph[-1].new_vp(
+            "int32_t",
+            vals=np.asarray(graph_memberships[-1], dtype=np.int32)
+        )
 
-    if edge_sampling_rate < 1.0:
-        for t, g in enumerate(graph):
-            print(f"Edge sampling snapshot {t+1}/{snapshots}...", end="\r")
-            edges = list(g.edges())
-            if not edges:
+    # Build node index for edge sampling with isolate removal.
+    for t, g in enumerate(graph):
+        orig_idx = g.new_vp("int64_t")
+        orig_idx.a = np.arange(g.num_vertices(), dtype=np.int64)
+        g.vp["orig_idx"] = orig_idx
+        # Sample edges according to edge_sampling_rate (beta parameter).
+        if edge_sampling_rate < 1.0:
+            print(f"Edge sampling snapshot {t + 1}/{snapshots}...", end="\r")
+            # If there are no edges, skip sampling to avoid errors.
+            n_edges = g.num_edges()
+            if n_edges == 0:
                 continue
-            keep_mask = np.random.random(len(edges)) < edge_sampling_rate
-            if not np.all(keep_mask):
-                g.remove_edges_from(
-                    [edge for edge, keep in zip(edges, keep_mask) if not keep]
-                )
+            # Sample which edges to keep.
+            keep_mask = np.random.random(n_edges) < edge_sampling_rate
+            if np.all(keep_mask):
+                continue
+            # Get edge indices, create a boolean mask of edges to keep and apply it to the graph.
+            edge_idx = g.get_edges([g.edge_index])[:, 2]
+            keep = g.new_ep("bool", val=True)
+            keep.a[edge_idx] = keep_mask
+            g.set_edge_filter(keep)
+            g.purge_edges()
+            g.clear_filters()
+            # Get node isolates after edge sampling and remove them.
+            is_not_isolate = g.new_vp("bool")
+            is_not_isolate.a = g.degree_property_map("total").a > 0
+            g.set_vertex_filter(is_not_isolate)
+            g.purge_vertices()
+            g.clear_filters()
 
-    sbm.graph = graph[::-1] if reverse_snapshot_order else graph
+    sbm.graph = (
+        graph[::-1] if reverse_snapshot_order else graph)
+    sbm.graph_memberships = (
+        graph_memberships[::-1] if reverse_snapshot_order else graph_memberships)
+
     return sbm
