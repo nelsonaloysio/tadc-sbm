@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tadc-sbm"
-version = "0.1.7"
+version = "0.1.8"
 description = "A Time-varying, Attributed, Degree-Corrected Stochastic Block Model"
 requires-python = ">=3.7"
 readme = {file = "README.md", content-type = "text/markdown"}
