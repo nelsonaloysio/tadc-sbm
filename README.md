@@ -1,7 +1,7 @@
 # TADC-SBM: a Time-varying, Attributed, Degree-Corrected Stochastic Block Model
 
-[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadcsbm/blob/main/notebook.ipynb)
-[![License](https://img.shields.io/github/license/nelsonaloysio/tadcsbm)](https://github.com/nelsonaloysio/tadcsbm/blob/main/LICENSE)
+[![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadc-sbm/blob/main/notebook.ipynb)
+[![License](https://img.shields.io/pypi/l/tadc-sbm)](https://github.com/nelsonaloysio/tadc-sbm/blob/main/LICENSE.md)
 [![PDF](https://img.shields.io/badge/pdf-Paper-red)](https://nelsonaloysio.github.io/files/tadcsbm2025.pdf)
 [![DOI](https://img.shields.io/badge/doi-10.1109/ISCC65549.2025.11326334-blue)](https://doi.org/10.1109/ISCC65549.2025.11326334)
 
@@ -22,10 +22,10 @@ Node- and edge-level attribute features are drawn from a multivariate distributi
 
 ## Install
 
-The package is available on PyPI as `tadcsbm` and can be installed with:
+The package is available on PyPI as `tadc-sbm` and can be installed with:
 
 ```bash
-pip install tadcsbm
+pip install tadc-sbm
 ```
 
 A binary script `tadc-sbm` is included for command line usage, which can be run with `python -m tadc-sbm` or simply `tadc-sbm` if the package is installed. Note that it is not necessary to install the package to run the script.
@@ -34,16 +34,16 @@ A binary script `tadc-sbm` is included for command line usage, which can be run 
 
 Requirements may be installed from [PyPI (requirements.txt)](requirements.txt) or using [conda (environment.yml)](environment.yml).
 
-> The [graph-tool](https://graph-tool.skewed.de/) library must be available in the user space: `conda install -c conda-forge graph-tool`.
-> Alternatively, see the [graph-tool documentation](https://graph-tool.skewed.de) for other platforms and package managers, including Docker and Homebrew.
-
 It is **not** advised to install the [conda environment](environment.yml) as-is (but you certainly may!). Instead, try the following, more flexible environment to solve. Last tested with **Python 3.11** (but should work recent versions as well):
 
 ```bash
 conda create -n tadcsbm -c conda-forge python=3.11 graph-tool  # tested with 2.96
-conda activate tadcsbm
+conda activate tadc-sbm
 pip install -r requirements.txt
 ```
+
+> The [graph-tool](https://graph-tool.skewed.de/) library must be available in the user space: `conda install -c conda-forge graph-tool`.
+> See also the [documentation](https://graph-tool.skewed.de) for other platforms and package managers, including Docker and Homebrew.
 
 ## Usage
 

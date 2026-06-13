@@ -4,16 +4,16 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tadc-sbm"
-version = "0.1.5"
+version = "0.1.6"
 description = "A Time-varying, Attributed, Degree-Corrected Stochastic Block Model"
 requires-python = ">=3.7"
 readme = {file = "README.md", content-type = "text/markdown"}
 # license = "Apache Software License 2.0"
 # license-files = ["LICENSE.md"]
-keywords = ["Temporal Network", "Attributed Graph", "Graph Generative Model", "Graph Sampling"]
 authors = [
     {name = "Nelson Aloysio Reis de Almeida Passos", email = "nelson.reis@phd.unipi.it"}
 ]
+keywords = ["Temporal Network", "Attributed Graph", "Graph Generative Model", "Graph Sampling"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -24,7 +24,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    # "graph-tool=2.96",  # conda install -c conda-forge graph-tool
+    # "graph-tool=2.96",
     "matplotlib>=3.10.1",
     "networkx>=3.4.2",
     "networkx-temporal>=1.2.1",
