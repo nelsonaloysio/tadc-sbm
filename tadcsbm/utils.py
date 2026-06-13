@@ -1,6 +1,7 @@
 from typing import Optional, Union
 
 import networkx as nx
+import networkx_temporal as tx
 import numpy as np
 
 
@@ -55,8 +56,6 @@ def generate_block_matrix(
         p = (1 - (q or 0))
     if q is None:
         q = (1 - p)
-
-    assert p + q == 1, "The sum of `p` and `q` must be equal to 1."
 
     B = np.zeros((communities, communities))
     for i in range(communities):
@@ -257,10 +256,38 @@ def generate_community_vector(
     return community_vector
 
 
-def gt_to_nx(graph, time=0):
-    """Convert a graph-tool Graph to NetworkX."""
+def gt_to_nx(graph):
+    """Convert a graph-tool object to NetworkX object."""
     G = nx.MultiGraph()
-    G.add_nodes_from(graph.get_vertices())
-    G.add_edges_from([(e.source(), e.target(), {"time": time}) for e in graph.edges()])
-    G = nx.relabel_nodes(G, {v: int(v) for v in G.nodes()})
+    orig = graph.vp["orig_idx"].a
+    edges = graph.get_edges()[:, :2]
+    community = graph.vp["community"].a
+    G.add_nodes_from(
+        (int(orig[v]), {"community": int(community[v])})
+        for v in range(graph.num_vertices())
+    )
+    G.add_edges_from(
+        (int(orig[u]), int(orig[v]))
+        for u, v in edges
+    )
     return G
+
+
+def gt_to_nx_temporal(graphs):
+    """Convert a list of graph-tool objects to NetworkX-Temporal object."""
+    TG = tx.TemporalMultiGraph(t=len(graphs))
+
+    for i, g in enumerate(graphs):
+        orig = g.vp["orig_idx"].a
+        edges = g.get_edges()[:, :2]
+        community = g.vp["community"].a
+        TG[i].add_nodes_from(
+            (int(orig[v]), {"community": int(community[v])})
+            for v in range(g.num_vertices())
+        )
+        TG[i].add_edges_from(
+            (int(orig[u]), int(orig[v]), {"time": i})
+            for u, v in edges
+        )
+
+    return TG
