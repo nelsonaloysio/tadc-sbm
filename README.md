@@ -2,9 +2,9 @@
 
 [![PyPI](https://badge.fury.io/py/tadc-sbm.svg)](https://badge.fury.io/py/tadc-sbm)
 [![Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/nelsonaloysio/tadc-sbm/blob/main/notebook.ipynb)
-[![License](https://img.shields.io/pypi/l/tadc-sbm)](https://github.com/nelsonaloysio/tadc-sbm/blob/main/LICENSE.md)
-[![PDF](https://img.shields.io/badge/pdf-Paper-red)](https://nelsonaloysio.github.io/files/tadcsbm2025.pdf)
 [![DOI](https://img.shields.io/badge/doi-10.1109/ISCC65549.2025.11326334-blue)](https://doi.org/10.1109/ISCC65549.2025.11326334)
+[![PDF](https://img.shields.io/badge/pdf-Paper-red)](https://nelsonaloysio.github.io/files/tadcsbm2025.pdf)
+[![License](https://img.shields.io/pypi/l/tadc-sbm)](https://github.com/nelsonaloysio/tadc-sbm/blob/main/LICENSE.md)
 
 This is the code repository for the accompanying paper:
 
