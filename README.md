@@ -160,13 +160,13 @@ Average within/between ratio across snapshots: 8.49
 Expected within/between ratio (p/q) overall: 9.00
 ```
 
-See the included [examples](examples) directory for sample outputs used in the accompanying paper.
+See the included [examples](examples) directory for sample outputs in legacy format used in the accompanying paper.
 
 > Varying the value of $\eta \in [0, 1]$ (`--eta`) produces snapshots with different community stability rates, while the value of $\gamma \in \\{0, 1\\}$ (`--gamma`) fixes the community transition probabilities for nodes in each snapshot.
 
 ### Data conversion
 
-Resulting output is saved in compressed [NetworkX](https://networkx.org)-compatible and [NumPy](https://numpy.org) formats, and may be opened with a number of libraries and tools.
+Resulting snapshots are saved as compressed [NetworkX](https://networkx.org)-compatible and [NumPy](https://numpy.org) formats, and may be opened with a number of libraries and tools.
 See also: the [`convert`](https://networkx-temporal.readthedocs.io/en/stable/api/utils.html#networkx_temporal.utils.convert.convert) and [`read_graph`](https://networkx-temporal.readthedocs.io/en/stable/api/readwrite.html#networkx_temporal.readwrite.read_graph) functions from [NetworkX-Temporal](https://networkx-temporal.org).
 
 ## Acknowledgements
