@@ -6,4 +6,5 @@ from .utils import (
     generate_community_vector,
     gt_to_nx_temporal,
     gt_to_nx,
+    inspect_sbm
 )

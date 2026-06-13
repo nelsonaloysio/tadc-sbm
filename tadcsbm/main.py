@@ -25,6 +25,7 @@ from .utils import (
     generate_transition_matrix,
     generate_community_vector,
     gt_to_nx_temporal,
+    inspect_sbm
 )
 
 
@@ -201,37 +202,8 @@ def main():
 
     print(TG)
     if args.verbose:
-        V, E, T = 0, 0, 0
+        print()
+        inspect_sbm(sbm, mat)
 
-        p = np.diag(mat).mean()
-        q = mat[~np.eye(mat.shape[0], dtype=bool)].sum()/mat.shape[0]
-
-        ratios = []
-        expected_ratio = p / q if q > 0 else 1
-
-        for i, (g, memberships) in enumerate(zip(sbm.graph, sbm.graph_memberships)):
-            V += g.num_vertices()
-            E += g.num_edges()
-            T += np.sum(memberships != sbm.graph_memberships[i-1]) if i > 0 else 0
-
-            D = {}
-            for (u, v) in TG[i].edges():
-                c_u = TG[i].nodes[u]["community"]
-                c_v = TG[i].nodes[v]["community"]
-                D[c_u == c_v] = D.get(c_u == c_v, 0) + 1
-
-            within = sum(v for k, v in D.items() if k is True)
-            between = sum(v for k, v in D.items() if k is False)
-            ratio = within / between if between > 0 else 1
-            ratios.append(ratio)
-
-            print(f"- Snapshot {i+1}/{len(sbm.graph)}: "
-                  f"{g.num_vertices()} nodes, {g.num_edges()} edges, "
-                  f"communities: {np.bincount(memberships)}, "
-                  f"within-/between-edge ratio: {ratio:.2f}")
-
-        print(f"Total nodes across snapshots: {V}",
-              f"\nTotal edges across snapshots: {E}",
-              f"\nTotal transitions across snapshots: {T} ({T/(V-g.num_vertices()):.2%})",
-              f"\nAverage within/between ratio across snapshots: {np.mean(ratios):.2f}",
-              f"\nExpected within/between ratio (p/q) overall: {expected_ratio:.2f}")
+if __name__ == "__main__":
+    main()

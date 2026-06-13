@@ -291,3 +291,45 @@ def gt_to_nx_temporal(graphs):
         )
 
     return TG
+
+
+def inspect_sbm(sbm, mat):
+    """Inspect the generated SBM graph snapshots."""
+    print("Inspecting graph snapshots...", end="\r")
+    V, E, T = 0, 0, 0
+
+    p = np.diag(mat).mean()
+    q = mat[~np.eye(mat.shape[0], dtype=bool)].sum()/mat.shape[0]
+
+    ratios = []
+    expected_ratio = p / q if q > 0 else 1
+
+    for i, (g, memberships) in enumerate(zip(sbm.graph, sbm.graph_memberships)):
+        V += g.num_vertices()
+        E += g.num_edges()
+        T += (memberships != sbm.graph_memberships[i-1])[g.get_vertices()].sum() if i else 0
+
+        vp = g.vp["community"]
+        community = {int(v): vp[v] for v in g.get_vertices()}
+
+        D = {}
+        for (u, v) in g.edges():
+            c_u = community[u]
+            c_v = community[v]
+            D[c_u == c_v] = D.get(c_u == c_v, 0) + 1
+
+        within = sum(v for k, v in D.items() if k is True)
+        between = sum(v for k, v in D.items() if k is False)
+        ratio = within / between if between > 0 else 1
+        ratios.append(ratio)
+
+        print(f"Snapshot {i+1}/{len(sbm.graph)}: "
+                f"{g.num_vertices()} nodes, {g.num_edges()} edges, "
+                f"communities: {np.bincount(memberships)}, "
+                f"within/between edge ratio: {ratio:.2f}")
+
+    print(f"\nTotal nodes across snapshots: {V}",
+          f"\nTotal edges across snapshots: {E}",
+          f"\nTotal transitions across snapshots: {T} ({T/(V-g.num_vertices() or 1):.2%})",
+          f"\n\nAverage within/between ratio across snapshots: {np.mean(ratios):.2f}",
+          f"\nExpected within/between ratio (p/q) overall: {expected_ratio:.2f}")
